@@ -1,0 +1,77 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    // Complete the countTriplets function below.
+    static long countTriplets(List<Long> arr, long r) {
+        
+        
+         long count =0;
+        Map<Long, Long> rightmap = new  HashMap<>();
+        Map<Long, Long> leftmap = new HashMap<>();
+        for(long k: arr){
+            if(rightmap.containsKey(k)) {
+             rightmap.put(k, rightmap.get(k) + 1);
+            }else {
+                rightmap.put(k, 1L);
+            }
+        }
+        
+        for(int i=0; i<arr.size(); i++){
+            long term = arr.get(i);
+            long l_f =0;
+            long r_f =0;
+            if(rightmap.containsKey(term))
+            rightmap.put(term, rightmap.get(term) - 1);
+            
+            if(leftmap.containsKey(term/r) && term % r ==0){
+                l_f = leftmap.get(term/r);
+            }
+            if(rightmap.containsKey(term *r)){
+                r_f = rightmap.get(term * r);
+            }
+            count += l_f * r_f;
+            if(leftmap.containsKey(term)) {
+            leftmap.put(term, leftmap.get(term) + 1);
+            }else {
+                leftmap.put(term, 1L);
+            }
+        }
+
+   return count;
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        String[] nr = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+        int n = Integer.parseInt(nr[0]);
+
+        long r = Long.parseLong(nr[1]);
+
+        String[] arrItems = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+        List<Long> arr = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            long arrItem = Long.parseLong(arrItems[i]);
+            arr.add(arrItem);
+        }
+
+        long ans = countTriplets(arr, r);
+
+        bufferedWriter.write(String.valueOf(ans));
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}

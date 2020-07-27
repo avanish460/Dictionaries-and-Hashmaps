@@ -1,0 +1,96 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    // Complete the freqQuery function below.
+    static List<Integer> freqQuery(List<List<Integer>> queries) {
+
+         List<Integer> result = new ArrayList<>();
+       HashMap<Integer,Integer> vals = new HashMap<>();
+       HashMap<Integer, HashSet<Integer>> freq = new HashMap<>();
+       for(List<Integer> list: queries){
+           int cmd = list.get(0);
+           int val = list.get(1);
+           if(cmd == 1){
+               if(!vals.containsKey(val)){ //no value
+                   vals.put(val,1);  //update vals
+                   if(!freq.containsKey(1)){ // no freq 
+                       freq.put(1,new HashSet<Integer>());
+                    } 
+                    freq.get(1).add(val);//add the new val in
+               }
+               else{ // there is a prev value
+                    int prevF = vals.get(val);
+                    vals.put(val,1+prevF);//update vals
+                    freq.get(prevF).remove(val);//remove from prevF set
+                    if(!freq.containsKey(1+prevF)){ // create new hashset
+                         freq.put(1+prevF,new HashSet<Integer>());
+                    }
+                    freq.get(1+prevF).add(val);//add the new val in
+               }
+           }
+            else if (cmd == 2){
+               if(vals.containsKey(val)){ //there is prev val
+                    int prevF = vals.get(val);
+                    if(prevF == 1){ // remove this element 
+                       vals.remove(val); // removes it from value list
+                       freq.get(1).remove(val); // removes it from freq set
+                    } else{
+                        vals.put(val,prevF-1);//update vals
+                        freq.get(prevF).remove(val);//remove from prevF set
+                        freq.get(prevF-1).add(val);//add the new val in
+                    }
+               }
+            }
+            else{
+                int p = freq.containsKey(val)&&!freq.get(val).isEmpty() ? 1 : 0; //check if the specific freq has a val in hashset
+                result.add(p);
+            }
+        }
+        return result;
+        
+    }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int q = Integer.parseInt(bufferedReader.readLine().trim());
+
+        List<List<Integer>> queries = new ArrayList<>();
+
+        for (int i = 0; i < q; i++) {
+            String[] queriesRowTempItems = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
+
+            List<Integer> queriesRowItems = new ArrayList<>();
+
+            for (int j = 0; j < 2; j++) {
+                int queriesItem = Integer.parseInt(queriesRowTempItems[j]);
+                queriesRowItems.add(queriesItem);
+            }
+
+            queries.add(queriesRowItems);
+        }
+
+        List<Integer> ans = freqQuery(queries);
+
+        for (int i = 0; i < ans.size(); i++) {
+            bufferedWriter.write(String.valueOf(ans.get(i)));
+
+            if (i != ans.size() - 1) {
+                bufferedWriter.write("\n");
+            }
+        }
+
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
